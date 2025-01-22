@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 import LicencePlate from "./components/LicencePlate.vue";
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from "html-to-image";
+import SettingsPanel from "./components/SettingsPanel.vue";
 
 const plate = ref(null);
 
@@ -15,18 +16,27 @@ const render = () => {
       document.body.appendChild(img);
     })
     .catch(function (error) {
-      console.error('oops, something went wrong!', error);
+      console.error("oops, something went wrong!", error);
     });
 };
+
+const settings = ref({
+  serial: "",
+});
 </script>
 
 <template>
-  <div>
-    <LicencePlate ref="plate" />
-    <button @click="render">Render that up bro</button>
+  <div
+    class="grid h-screen grid-cols-[1fr_auto] gap-6 bg-gray-50 p-8 text-black dark:bg-gray-800 dark:text-white"
+  >
+    <LicencePlate
+      ref="plate"
+      class="place-self-center"
+      :serial="settings.serial"
+    />
+    <div>
+      {{ settings }}
+      <SettingsPanel class="w-80 place-self-end" v-model="settings" />
+    </div>
   </div>
 </template>
-
-<style>
-@import url("/src/assets/fonts.css");
-</style>

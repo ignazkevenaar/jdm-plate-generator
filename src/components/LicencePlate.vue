@@ -1,4 +1,17 @@
-<script setup></script>
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  serial: {
+    type: String,
+    default: "",
+  },
+});
+
+const showSerialSeparator = computed(() => {
+  return props.serial.length >= 4;
+});
+</script>
 
 <template>
   <div class="licencePlate">
@@ -31,11 +44,24 @@
       <!-- <p class="kana"><span>ぬ</span></p> -->
       <p class="kana"><span>は</span></p>
       <div class="serial">
-        <div class="number"><span>3</span></div>
-        <div class="number"><span>6</span></div>
-        <div class="separator"><span></span></div>
-        <div class="number"><span>8</span></div>
-        <div class="number"><span>0</span></div>
+        <div class="number" :class="{ dot: serial.length < 4 }">
+          <span>{{ serial?.[serial.length - 4] }}</span>
+        </div>
+        <div class="number" :class="{ dot: serial.length < 3 }">
+          <span>{{ serial?.[serial.length - 3] }}</span>
+        </div>
+        <div
+          class="separator"
+          :style="{ opacity: showSerialSeparator ? 1 : 0 }"
+        >
+          <span></span>
+        </div>
+        <div class="number" :class="{ dot: serial.length < 2 }">
+          <span>{{ serial?.[serial.length - 2] }}</span>
+        </div>
+        <div class="number" :class="{ dot: serial.length < 1 }">
+          <span>{{ serial?.[serial.length - 1] }}</span>
+        </div>
       </div>
       <!-- <div class="serial">
         <div class="number dot"><span></span></div>
