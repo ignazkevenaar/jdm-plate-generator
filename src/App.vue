@@ -21,7 +21,8 @@ const render = () => {
 };
 
 const settings = ref({
-  serial: "",
+  serial: "1",
+  office: "TKS",
 });
 </script>
 
@@ -33,6 +34,7 @@ const settings = ref({
       ref="plate"
       class="place-self-center"
       :serial="settings.serial"
+      :office="settings.office"
     />
     <div>
       {{ settings }}

@@ -1,8 +1,13 @@
 <script setup>
 import { computed } from "vue";
+import offices from "../data/offices.json";
 
 const props = defineProps({
   serial: {
+    type: String,
+    default: "",
+  },
+  office: {
     type: String,
     default: "",
   },
@@ -11,12 +16,53 @@ const props = defineProps({
 const showSerialSeparator = computed(() => {
   return props.serial.length >= 4;
 });
+
+const flatOffices = computed(() =>
+  offices.flatMap((prefecture) =>
+    prefecture.municipalities.flatMap(
+      (municipalities) => municipalities.markings,
+    ),
+  ),
+);
+
+const formattedOffice = computed(() => {
+  const found = flatOffices.value.find(
+    (office) => office.international === props.office,
+  );
+  if (found) return found.kanji;
+  return "ERR";
+});
+
+const currentPrefecture = computed(() => {
+  if (props.office === "") return undefined;
+
+  return offices.find((prefecture) =>
+    prefecture.municipalities.some((municipality) =>
+      municipality.markings.find(
+        (marking) => marking.international === props.office,
+      ),
+    ),
+  );
+});
+
+const sealCharacters = computed(() => {
+  if (currentPrefecture.value === undefined) return "";
+
+  const repeatingCharacters = ["愛", "福", "宮", "長", "大", "山"];
+
+  let output = currentPrefecture.value?.kanji.charAt(0);
+
+  if (repeatingCharacters.includes(output)) {
+    output += currentPrefecture.value?.kanji.charAt(1);
+  }
+
+  return output;
+});
 </script>
 
 <template>
   <div class="licencePlate">
     <div class="border"><div></div></div>
-
     <!-- <img src="/img/reference1.png" alt="plate reference" class="reference" /> -->
     <!-- <img src="/img/reference2.png" alt="plate reference" class="reference" /> -->
     <!-- <img src="/img/reference3.png" alt="plate reference" class="reference" /> -->
@@ -24,7 +70,13 @@ const showSerialSeparator = computed(() => {
       <div>
         <div class="seal">
           <div>
-            <span>東</span>
+            <span :class="{ small: sealCharacters.length > 1 }">
+              <span v-text="sealCharacters[0]" />
+              <span
+                v-if="sealCharacters.length > 1"
+                v-text="sealCharacters[1]"
+              />
+            </span>
           </div>
         </div>
       </div>
@@ -33,9 +85,7 @@ const showSerialSeparator = computed(() => {
       </div>
     </div>
     <div class="topRow">
-      <!-- <p>品川</p> -->
-      <!-- <p class="office">富士山</p> -->
-      <p class="office">岐阜</p>
+      <p class="office">{{ formattedOffice }}</p>
       <!-- <p class="classification">33</p> -->
       <!-- <p class="classification wide">３３</p> -->
       <p class="classification">330</p>
@@ -63,20 +113,6 @@ const showSerialSeparator = computed(() => {
           <span>{{ serial?.[serial.length - 1] }}</span>
         </div>
       </div>
-      <!-- <div class="serial">
-        <div class="number dot"><span></span></div>
-        <div class="number dot"><span></span></div>
-        <div class="separator" style="opacity: 0;"></div>
-        <div class="number dot"><span></span></div>
-        <div class="number"><span>8</span></div>
-      </div> -->
-      <!-- <div class="serial">
-        <div class="number"><span>7</span></div>
-        <div class="number"><span>7</span></div>
-        <div class="separator"><span></span></div>
-        <div class="number"><span>7</span></div>
-        <div class="number"><span>7</span></div>
-      </div> -->
     </div>
   </div>
 </template>
@@ -170,8 +206,9 @@ const showSerialSeparator = computed(() => {
         background-color: grey;
         width: 28mm;
         height: 28mm;
-        font-weight: 700;
-        font-family: "Zen Maru Gothic", serif;
+        font-weight: 400;
+        /* font-family: "Zen Maru Gothic", serif; */
+        font-family: "M PLUS Rounded 1c", serif;
 
         > div {
           display: grid;
@@ -211,13 +248,22 @@ const showSerialSeparator = computed(() => {
 
           span {
             position: relative;
-            top: -1mm;
+            top: -0.25mm;
             color: silver;
             font-size: 12mm;
             line-height: 0;
             text-shadow:
               0.25mm 0.25mm 0.25mm white,
               -0.2mm -0.2mm 0.5mm black;
+
+            &.small {
+              span {
+                display: block;
+                transform: scaleY(0.8);
+                font-size: 8mm;
+                line-height: 7mm;
+              }
+            }
           }
         }
       }

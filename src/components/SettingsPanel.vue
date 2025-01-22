@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { computed, onMounted } from "vue";
 import InputText from "./settings/InputText.vue";
 import SettingsSection from "./SettingsSection.vue";
+import offices from "../data/offices.json";
 
 const model = defineModel();
 
@@ -8,6 +10,17 @@ const checkValiditySerial = (event) => {
   if (event.target.value.match(/^\d{0,4}$/))
     model.value.serial = event.target.value;
 };
+
+const formattedOffices = computed(() =>
+  offices.flatMap((prefecture) =>
+    prefecture.municipalities.flatMap((municipality) =>
+      municipality.markings.flatMap((marking) => ({
+        value: marking.international,
+        text: `${prefecture.transliteration} - ${municipality.name} - ${marking.transliteration} / ${marking.kanji}`,
+      })),
+    ),
+  ),
+);
 </script>
 
 <template>
@@ -23,6 +36,17 @@ const checkValiditySerial = (event) => {
           pattern="[0-9]{4}"
           @input="checkValiditySerial($event)"
         />
+      </SettingsSection>
+      <SettingsSection title="Office">
+        <select v-model="model.office">
+          <option
+            v-for="office in formattedOffices"
+            :value="office.value"
+            :key="office.value"
+          >
+            {{ office.text }}
+          </option>
+        </select>
       </SettingsSection>
     </div>
     <div class="text-center">
