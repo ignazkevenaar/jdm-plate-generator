@@ -3,11 +3,23 @@ import { computed } from "vue";
 import offices from "../data/offices.json";
 
 const props = defineProps({
+  color: {
+    type: String,
+    default: "",
+  },
   serial: {
     type: String,
     default: "",
   },
   office: {
+    type: String,
+    default: "",
+  },
+  classification: {
+    type: String,
+    default: "",
+  },
+  kana: {
     type: String,
     default: "",
   },
@@ -61,8 +73,8 @@ const sealCharacters = computed(() => {
 </script>
 
 <template>
-  <div class="licencePlate">
-    <div class="border"><div></div></div>
+  <div class="licencePlate" :class="color">
+    <div class="ridge"><div></div></div>
     <!-- <img src="/img/reference1.png" alt="plate reference" class="reference" /> -->
     <!-- <img src="/img/reference2.png" alt="plate reference" class="reference" /> -->
     <!-- <img src="/img/reference3.png" alt="plate reference" class="reference" /> -->
@@ -85,14 +97,27 @@ const sealCharacters = computed(() => {
       </div>
     </div>
     <div class="topRow">
-      <p class="office">{{ formattedOffice }}</p>
-      <!-- <p class="classification">33</p> -->
-      <!-- <p class="classification wide">３３</p> -->
-      <p class="classification">330</p>
+      <p
+        class="office"
+        :class="{
+          three: formattedOffice.length === 3,
+          four: formattedOffice.length === 4,
+        }"
+      >
+        {{ formattedOffice }}
+      </p>
+      <p
+        v-if="classification"
+        class="classification"
+        :class="{ wide: classification.length < 3 }"
+      >
+        {{ classification }}
+      </p>
     </div>
     <div class="bottomRow">
-      <!-- <p class="kana"><span>ぬ</span></p> -->
-      <p class="kana"><span>は</span></p>
+      <p class="kana">
+        <span>{{ kana }}</span>
+      </p>
       <div class="serial">
         <div class="number" :class="{ dot: serial.length < 4 }">
           <span>{{ serial?.[serial.length - 4] }}</span>
@@ -123,22 +148,42 @@ const sealCharacters = computed(() => {
   box-shadow: 5mm 10mm 25mm black;
   border: 2px solid rgba(0 0 0 / 20%);
   border-radius: 10mm;
-  background-color: #d7d8d5;
+  background-color: var(--plate-background);
   aspect-ratio: 2;
   width: 330mm;
   height: 165mm;
-  color: #194a17;
+  color: var(--plate-foreground);
 
-  .border {
+  &.regular {
+    --plate-background: #d7d8d5;
+    --plate-foreground: #194a17;
+  }
+
+  &.kei {
+    --plate-background: #f1c209;
+    --plate-foreground: #000;
+  }
+
+  &.commercial {
+    --plate-background: #194a17;
+    --plate-foreground: #d7d8d5;
+  }
+
+  &.commercial-kei {
+    --plate-background: #000;
+    --plate-foreground: #f1c209;
+  }
+
+  .ridge {
     position: absolute;
-    inset: 3mm;
+    inset: 2mm;
     box-shadow:
       inset 1mm 1mm 2mm rgba(255, 255, 255, 0.5),
       inset -1mm -1mm 2mm rgba(0, 0, 0, 0.25),
       1mm 1mm 1mm rgba(0, 0, 0, 0.2),
       -1mm -1mm 1mm rgba(255, 255, 255, 0.5);
     border-radius: 7mm;
-    background-color: #d7d8d5;
+    background-color: var(--plate-background);
 
     > div {
       position: absolute;
@@ -149,7 +194,7 @@ const sealCharacters = computed(() => {
         inset 1mm 1mm 1mm rgba(0, 0, 0, 0.1),
         inset -1mm -1mm 1mm rgba(255, 255, 255, 0.5);
       border-radius: 3mm;
-      background-color: #d7d8d5;
+      background-color: var(--plate-background);
     }
   }
 
@@ -282,17 +327,16 @@ const sealCharacters = computed(() => {
   .topRow {
     top: 13.5mm;
     left: 2.5mm;
+    justify-content: space-evenly;
+    /* background-color: rgba(255, 0, 0, 0.25); */
     width: 190mm;
     height: 40mm;
-    /* background-color: rgba(0, 255, 0, 0.25); */
     white-space: nowrap;
 
     .office {
-      /* background-color: rgba(0, 0, 255, 0.1); */
-      flex-grow: 1;
       transform-origin: center left;
       filter: url("#drop-shadow");
-
+      /* background-color: rgba(0, 0, 255, 0.1); */
       font-weight: 500;
       font-size: 48mm;
       /* font-family: "Kiwi Maru", serif; */
@@ -301,20 +345,32 @@ const sealCharacters = computed(() => {
       font-family: "M PLUS Rounded 1c", serif;
       letter-spacing: -4mm;
 
-      &.narrow {
-        transform: scale(0.85, 1);
-        margin-inline-end: -10%;
+      &.three {
+        transform: scaleY(1.5);
+        font-size: 30mm;
+        letter-spacing: normal;
+      }
+
+      &.four {
+        transform: scaleY(2);
+        font-weight: 600;
+        font-size: 23mm;
+        letter-spacing: normal;
       }
     }
 
     .classification {
       position: relative;
       top: 4mm;
-      flex-grow: 1;
-      font-size: 49mm;
       /* background-color: rgba(0, 0, 255, 0.1); */
+      font-size: 49mm;
       font-family: "TrmFontJB";
       letter-spacing: -1mm;
+
+      &.wide {
+        transform: scaleY(0.75);
+        font-size: 65mm;
+      }
     }
   }
 

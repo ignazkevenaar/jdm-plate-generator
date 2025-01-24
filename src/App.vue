@@ -21,8 +21,11 @@ const render = () => {
 };
 
 const settings = ref({
+  color: "regular",
   serial: "1",
   office: "TKS",
+  classification: "33",
+  kana: "つ",
 });
 </script>
 
@@ -33,11 +36,13 @@ const settings = ref({
     <LicencePlate
       ref="plate"
       class="place-self-center"
+      :color="settings.color"
       :serial="settings.serial"
       :office="settings.office"
+      :classification="settings.classification"
+      :kana="settings.kana"
     />
     <div>
-      {{ settings }}
       <SettingsPanel class="w-80 place-self-end" v-model="settings" />
     </div>
   </div>
