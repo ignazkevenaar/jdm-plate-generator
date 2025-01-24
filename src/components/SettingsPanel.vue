@@ -5,6 +5,9 @@ import ColorButton from "./settings/ColorButton.vue";
 import SettingsSection from "./SettingsSection.vue";
 import offices from "../data/offices.json";
 import kana from "../data/kana.json";
+import InputSelect from "./settings/InputSelect.vue";
+
+const version = import.meta.env.VITE_VERSION;
 
 const model = defineModel();
 
@@ -46,15 +49,28 @@ const formattedKana = computed(() => {
 
 <template>
   <div
-    class="flex flex-col overflow-hidden rounded-2xl bg-white *:p-4 dark:bg-gray-700"
+    class="flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-gray-700"
   >
-    <h1 class="text-center text-xl">JDM Plate generator</h1>
-    <p class="p-4">
-      {{ model }}
-    </p>
-    <div class="scrollbar-thin overflow-auto border-y dark:border-gray-800">
+    <div class="p-4">
+      <h1 class="text-center text-xl">JDM Plate generator</h1>
+      <div class="p-4 text-center">
+        <p class="text-xs opacity-65">
+          &copy;{{ new Date().getFullYear() }} Ignaz Kevenaar
+        </p>
+        <p>Version {{ version }}</p>
+        <a
+          href="https://github.com/ignazkevenaar/jdm-plate-generator"
+          target="_blank"
+        >
+          View on GitHub
+        </a>
+      </div>
+    </div>
+    <div
+      class="scrollbar-thin overflow-auto border-y *:p-4 dark:border-gray-800"
+    >
       <SettingsSection title="Color">
-        <div class="flex">
+        <div class="flex justify-evenly">
           <ColorButton
             v-model="model.color"
             value="regular"
@@ -94,15 +110,7 @@ const formattedKana = computed(() => {
         />
       </SettingsSection>
       <SettingsSection title="Office">
-        <select v-model="model.office">
-          <option
-            v-for="office in formattedOffices"
-            :value="office.value"
-            :key="office.value"
-          >
-            {{ office.text }}
-          </option>
-        </select>
+        <InputSelect v-model="model.office" :items="formattedOffices" />
       </SettingsSection>
       <SettingsSection title="Vehicle classification">
         <InputText
@@ -113,19 +121,12 @@ const formattedKana = computed(() => {
         />
       </SettingsSection>
       <SettingsSection title="Kana">
-        <select v-model="model.kana">
-          <option
-            v-for="kana in formattedKana"
-            :value="kana.value"
-            :key="kana.value"
-          >
-            {{ kana.text }}
-          </option>
-        </select>
+        <InputSelect v-model="model.kana" :items="formattedKana" />
       </SettingsSection>
     </div>
-    <div class="text-center">
+    <div class="p-4 text-center">
       <button
+        v-if="false"
         class="rounded-full bg-purple-600 px-8 py-2 text-lg font-bold capitalize text-white"
       >
         generate
